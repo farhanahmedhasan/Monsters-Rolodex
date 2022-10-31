@@ -1,34 +1,64 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import './App.css'
+import axios from "axios";
+import { Component } from "react";
+import "./App.css";
 
-function App() {
-  const [count, setCount] = useState(0)
+class App extends Component {
+  constructor() {
+    super();
+    this.state = {
+      monsters: [],
+      searchString: "",
+    };
+  }
 
-  return (
-    <div className="App">
-      <div>
-        <a href="https://vitejs.dev" target="_blank">
-          <img src="/vite.svg" className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://reactjs.org" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
+  async componentDidMount() {
+    this.mounted = true;
+    try {
+      const res = axios.get("https://jsonplaceholder.typicode.com/users");
+      const { data } = await res;
+
+      if (this.mounted) {
+        this.setState({ monsters: data });
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+  componentWillUnmount() {
+    this.mounted = false;
+  }
+
+  onSearch = (e) => {
+    const searchString = e.target.value.toLowerCase();
+    this.setState({ searchString });
+  };
+
+  render() {
+    const { monsters, searchString } = this.state;
+    const { onSearch } = this;
+
+    const searchedMonsters = monsters.filter((monster) =>
+      monster.name.toLowerCase().includes(searchString)
+    );
+
+    return (
+      <div className="App">
+        <input
+          className="search-box"
+          type="text"
+          placeholder="search monsters"
+          onChange={onSearch}
+        />
+        {searchedMonsters.map((monster) => {
+          const { name, id } = monster;
+          return <h1 key={id}>{name}</h1>;
+        })}
+
+        {searchedMonsters.length === 0 && <h1>Sorry We couldn't find any monsters</h1>}
       </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </div>
-  )
+    );
+  }
 }
 
-export default App
+export default App;
