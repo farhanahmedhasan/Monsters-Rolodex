@@ -1,4 +1,4 @@
-import { Component } from "react";
+import { useState, useEffect } from "react";
 
 import axios from "axios";
 
@@ -6,67 +6,59 @@ import CardList from "./components/card-list/CardList";
 import SearchBox from "./components/search-box/SearchBox";
 import "./App.css";
 
-class App extends Component {
-  constructor() {
-    super();
-    this.state = {
-      monsters: [],
-      searchString: "",
-      loading: true,
-    };
-  }
+const App = () => {
+  const [loading, setLoading] = useState(true);
+  const [searchField, setSearchField] = useState("");
+  const [monsters, setMonsters] = useState([]);
+  const [searchedMonsters, setSearchedMonsters] = useState(monsters);
 
-  async componentDidMount() {
-    this.mounted = true;
-    try {
-      const res = axios.get("https://jsonplaceholder.typicode.com/users");
-      const { data } = await res;
-
-      if (this.mounted) {
-        this.setState({ monsters: data });
-        this.setState({ loading: false });
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const res = axios.get("https://jsonplaceholder.typicode.com/users");
+        const { data } = await res;
+        setMonsters(data);
+        setLoading(false);
+      } catch (error) {
+        console.log(error);
+        setLoading(false);
       }
-    } catch (error) {
-      console.log(error);
-      this.setState({ loading: false });
-    }
-  }
+    };
+    fetchData();
+  }, []);
 
-  componentWillUnmount() {
-    this.mounted = false;
-  }
+  useEffect(() => {
+    const searchedMonsters = monsters.filter((monster) =>
+      monster.name.toLowerCase().includes(searchField)
+    );
 
-  onSearchChange = (e) => {
+    setSearchedMonsters(searchedMonsters);
+  }, [monsters, searchField]);
+
+  console.log(monsters);
+
+  const handleSearchChange = (e) => {
     const searchString = e.target.value.toLowerCase();
-    this.setState({ searchString });
+    setSearchField(searchString);
   };
 
-  render() {
-    const { monsters, searchString, loading } = this.state;
-    const { onSearchChange } = this;
+  return (
+    <div className="App">
+      <h1 className="app-title">Monsters Rolodex</h1>
 
-    const searchedMonsters = monsters.filter((monster) =>
-      monster.name.toLowerCase().includes(searchString)
-    );
+      <SearchBox
+        className="monsters-search-box"
+        placeholder={"Search monsters"}
+        onChangeHandler={handleSearchChange}
+      />
 
-    return (
-      <div className="App">
-        <h1 className="app-title">Monsters Rolodex</h1>
+      <CardList monsters={searchedMonsters} />
 
-        <SearchBox
-          className="monsters-search-box"
-          placeholder={"Search monsters"}
-          onChangeHandler={onSearchChange}
-        />
+      {loading && <h1>Loading....</h1>}
 
-        <CardList monsters={searchedMonsters} />
-
-        {loading && <h1>Loading....</h1>}
-
-        {searchedMonsters.length === 0 && !loading && <h1>Sorry We couldn't find any monsters</h1>}
-      </div>
-    );
-  }
-}
+      {searchedMonsters.length === 0 && !loading && <h1>Sorry We couldn't find any monsters</h1>}
+    </div>
+  );
+};
 
 export default App;
