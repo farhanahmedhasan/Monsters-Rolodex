@@ -10,7 +10,7 @@ const App = () => {
   const [loading, setLoading] = useState(true);
   const [searchField, setSearchField] = useState("");
   const [monsters, setMonsters] = useState([]);
-  const [searchedMonsters, setSearchedMonsters] = useState(monsters);
+  const [searchedMonsters, setSearchedMonsters] = useState([]);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -35,7 +35,7 @@ const App = () => {
     setSearchedMonsters(newSearchedMonsters);
   }, [monsters, searchField]);
 
-  console.log(searchedMonsters);
+  console.log({ monsters, searchedMonsters });
 
   const handleSearchChange = (e) => {
     const searchString = e.target.value.toLowerCase();
@@ -56,9 +56,7 @@ const App = () => {
 
       {loading && <h1>Loading....</h1>}
 
-      {searchedMonsters.length === 0 && !loading && (
-        <h1>Sorry We couldn't find any monsters</h1>
-      )}
+      {searchedMonsters.length === 0 && !loading && <h1>Sorry We couldn't find any monsters</h1>}
     </div>
   );
 };
