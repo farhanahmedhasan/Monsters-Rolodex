@@ -28,14 +28,14 @@ const App = () => {
   }, []);
 
   useEffect(() => {
-    const searchedMonsters = monsters.filter((monster) =>
+    const newSearchedMonsters = monsters.filter((monster) =>
       monster.name.toLowerCase().includes(searchField)
     );
 
-    setSearchedMonsters(searchedMonsters);
+    setSearchedMonsters(newSearchedMonsters);
   }, [monsters, searchField]);
 
-  console.log(monsters);
+  console.log(searchedMonsters);
 
   const handleSearchChange = (e) => {
     const searchString = e.target.value.toLowerCase();
@@ -56,7 +56,9 @@ const App = () => {
 
       {loading && <h1>Loading....</h1>}
 
-      {searchedMonsters.length === 0 && !loading && <h1>Sorry We couldn't find any monsters</h1>}
+      {searchedMonsters.length === 0 && !loading && (
+        <h1>Sorry We couldn't find any monsters</h1>
+      )}
     </div>
   );
 };
